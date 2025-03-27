@@ -5,6 +5,8 @@ Indoor Guide Drone for Visually Impaired People
 ## Current work
 Currently using canny edge detector for obstacle detector. However, avoidance mode is too easily activated. Trying to fix this. 
 
+<img src="figs/state_machine.png" width="700">
+
 ## Typical Flow of Function Calls
 Here’s a sample sequence of function calls based on state machine implementation:
 1. Drone Startup:
