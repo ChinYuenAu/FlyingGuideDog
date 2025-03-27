@@ -10,7 +10,7 @@ Thus, tracking is not functioning as expected.
 Trying to fix this. 
 
 ## Typical Flow of Function Calls
-<img src="figs/state_machine.png" width="700">
+<img src="figs/state_machine.png" width="600">
 
 Here’s a sample sequence of function calls based on state machine implementation:
 1. Drone Startup:
@@ -55,3 +55,10 @@ search_memory()
 capture_frames()
 - State machine to control the drone's behavior based on the current mode and detected obstacles by continuously capturing frames and listening for key presses
 
+## Replacing drone motor without soldering
+
+| Identify the right motor (CCW/Clockwise)       | Connect wires at different lengths to avoid shortcut | 
+| ---------------------------------------------- | ------------------------------------------------     |
+|<img src="figs/replace_motor1.jpg" width="300"> | <img src="figs/replace_motor2.jpg" width="300">      |
+| Put wires back                                 | Tape the wires                                       | 
+|<img src="figs/replace_motor3.jpg" width="300"> | <img src="figs/replace_motor4.jpg" width="300">      |
