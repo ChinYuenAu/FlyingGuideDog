@@ -2,14 +2,20 @@
 Indoor Guide Drone for Visually Impaired People
 
 
-## Current work
-Currently using canny edge detector for obstacle detector. However, avoidance mode is too easily activated. Trying to fix this. 
+## Current progress/issue 
+Currently using canny edge detector for obstacle detection. 
+However, avoidance mode is too easily activated.
+Not only close small objects, but also far huge objects form huge area by pixel, becoming false indicators.
+Thus, tracking is not functioning as expected.
+Trying to fix this. 
 
 ## Typical Flow of Function Calls
+<img src="figs/state_machine.png" width="700">
+
 Here’s a sample sequence of function calls based on state machine implementation:
 1. Drone Startup:
     * capture_frames() starts capturing video frames.
-    * The drone begins in None mode.
+    * The drone begins in SEARCHING mode.
 2. SEARCHING Mode:
     * track_aruco_marker() attempts to detect the marker.
     * If the marker is found:
