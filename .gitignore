@@ -1,5 +1,5 @@
 # Ignore script not used
-src/Misc
+Misc
 src/test_MPS
 src/DroneMain_copy
 src/DroneMain_tanishq
