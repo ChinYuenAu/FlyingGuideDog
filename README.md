@@ -1,21 +1,27 @@
 
-# 👨‍💻 Flying Guide Dog: Real-Time Indoor Navigation Drone 🤖
-Indoor Guide Drone for Visually Impaired People
+# 👨‍💻 Flying Guide Dog:<br/> Real-Time Indoor Navigation Drone 🤖
 
-**Project Goal:**  
-Develop a real-time drone navigation system using computer vision to autonomously follow a person wearing an ArUco marker indoors, with robust fallback tracking and obstacle avoidance. This system aims at assisting visually impaired individuals in navigating indoor environments.
+## 📌 Project Overview
 
-## 📌 Overview
+**Autonomous Drone-Based User Tracking with Obstacle Avoidance**  
+Project Goal: This project focuses on the core real-time navigation system for a future **“Flying Guide Dog”**—an assistive drone designed to help visually impaired individuals navigate complex indoor environments safely and autonomously.
 
-This project integrates:
-- **ArUco marker tracking** for precise pose estimation
-- **YOLOv5n + Deep SORT** as fallback tracker
-- **MiDaS depth estimation** for real-time obstacle avoidance
-- **PD controller** for drone movement stabilization
-- **DJI Tello EDU** as the aerial platform
-- **Single-camera monocular vision** as input
+This work delivers:
+- **Reliable person-following** via ArUco marker tracking  
+- **Fallback visual tracking** using YOLOv5 + Deep SORT when the marker is lost  
+- **Monocular obstacle avoidance** powered by MiDaS depth estimation  
+- **Smooth PD control** for stable and responsive flight behavior
 
-The drone follows the user, avoids obstacles (walls, doorframes), and handles sharp turns and temporary visual loss using fallback logic.
+> 🧩 While the broader “Flying Guide Dog” initiative envisions features like human-drone interaction, voice feedback, and semantic scene understanding, this project provides the **foundational autonomous navigation engine** that makes those higher-level features possible.
+
+Notably, this system is designed to run entirely on a **DJI Tello EDU** — a lightweight, low-cost drone with **limited onboard sensing and single-camera monocular vision**. Overcoming these constraints required rethinking traditional robotics pipelines and optimizing real-time computer vision to work under tight hardware limitations.  
+
+By **empowering entry-level drones** with advanced autonomous behavior, this project enhances **accessibility, scalability, and affordability**, paving the way for assistive drone technologies to reach a **wider audience** beyond high-end, research-grade hardware.
+
+
+
+
+
 
 ## 🚀 Features
 
