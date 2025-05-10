@@ -1,5 +1,5 @@
 
-# 👨‍💻 Flying Guide Dog:<br/> Real-Time Indoor Navigation Drone 🤖
+# 👨‍💻 Flying Guide Dog: Real-Time Indoor Navigation Drone 🤖
 
 ## 📌 Project Overview
 
@@ -18,8 +18,9 @@ Notably, this system is designed to run entirely on a **DJI Tello EDU** — a li
 
 By **empowering entry-level drones** with advanced autonomous behavior, this project enhances **accessibility, scalability, and affordability**, paving the way for assistive drone technologies to reach a **wider audience** beyond high-end, research-grade hardware.
 
-
-
+| DJI Tello EDU                                 | ArUco marker                                      |
+|---------------------------------------------- |---------------------------------------------------|
+|<img src="figs/DJI_Tello_EDU.JPG" width="200"> |<img src="figs/ArUco_6x6_1000-50.svg" width="200"> |
 
 
 
@@ -39,14 +40,11 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 
 ```
 .
-├── test_tracking_obstacle_avoidance_combine.py  # Unified control script
+├── src/
+|   ├──test_tracking_obstacle_avoidance_combine.py  # Unified control script
 ├── models/
-│   ├── yolov5n.torchscript                      # Lightweight YOLOv5n model
-│   ├── midas_small.pt                           # Depth estimation model
-├── utils/
-│   ├── depth_utils.py                           # MiDaS processing functions
-│   ├── control_utils.py                         # PD control and smoothing
-├── assets/                                      # Example outputs, evaluation images, logs
+│   ├── yolov5n.torchscript                         # Lightweight YOLOv5n model
+├── assets/                                         # Example outputs, evaluation images, logs
 ├── README.md
 ```
 
@@ -111,7 +109,11 @@ pip install -r requirements.txt
 
 ## 🧪 Example Output
 
-![Drone tracking ArUco marker around corner](assets/demo_corner_turn.gif)
+Video Frame(Left), Depth Map (right) <br/>
+<img src="figs/TrackingScreenshot.png" width="500"> <br/>
+<img src="figs/TrackingScreenshot2.png" width="500"> 
+
+
 
 ## 💡 Lessons Learned
 
