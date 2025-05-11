@@ -88,7 +88,7 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 | Turn Responsiveness               | Drone reduces radius and accelerates during sharp marker yaw changes |
 | Stability                         | Controlled oscillation with PID smoothing and min-speed gating       |
 
-## 🔧 Requirements
+## 🕹️ Requirements
 
 - macOS or Linux (tested on MacBook M1 Pro)
 - Python 3.10+
@@ -110,10 +110,10 @@ pip install -r requirements.txt
 ## 🧪 Example Output
 
 
-| Drone Camera View - BGR Frame(Left), Depth Map (right)  | Third person point of view |
+| Drone Camera View - BGR Frame(Left), Depth Map (Right)  | Third person point of view |
 |-------------------------------------------------------- |--------------------------- |
-| <img src="figs/TrackingScreenshot.png" width="500">     | <img src="figs/Screenshot_RouteView_RoomExitAndNavigation.png" width="500"> | 
-| <img src="figs/TrackingScreenshot2.png" width="500">    | <img src="figs/Screenshot_RouteView_CorridorNavigation.png" width="500"> | 
+| <img src="figs/TrackingScreenshot.png" width="500">     | <img src="figs/RouteView_RoomExitAndNavigation.png" width="500"> | 
+| <img src="figs/TrackingScreenshot2.png" width="500">    | <img src="figs/RouteView_CorridorNavigation.png" width="500"> | 
 
 
 
@@ -158,7 +158,7 @@ search_memory()
 capture_frames()
 - State machine to control the drone's behavior based on the current mode and detected obstacles by continuously capturing frames and listening for key presses
 
-## Replacing drone motor without soldering
+## 🛠️ Replacing drone motor without soldering
 
 | Identify the right motor (CCW/Clockwise)       | Connect wires at different lengths to avoid shortcut | 
 | ---------------------------------------------- | ------------------------------------------------     |
