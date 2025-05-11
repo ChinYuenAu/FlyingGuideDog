@@ -40,14 +40,14 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 
 ```
 .
+├── assets/                                         # Example outputs, evaluation images, logs
 ├── src/
 |   ├──test_tracking_obstacle_avoidance_combine.py  # Unified control script
 ├── models/
 │   ├── yolov5n.torchscript                         # Lightweight YOLOv5n model
-├── assets/                                         # Example outputs, evaluation images, logs
 ├── README.md
+├── requirements.txt
 ```
-
 
 ## 🧠 Methodology
 
@@ -89,10 +89,15 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 | Stability                         | Controlled oscillation with PID smoothing and min-speed gating       |
 
 ## 🕹️ Requirements
+This project is tested on MacBook M1 Pro. The following libraries and frameworks are required:
 
-- macOS or Linux (tested on MacBook M1 Pro)
 - Python 3.10+
-- OpenCV, Torch, djitellopy, Ultralytics YOLOv5, Deep SORT, MiDaS
+- OpenCV
+- NumPy
+- PyTorch
+- djitellopy (DJI Tello SDK)
+- Ultralytics YOLO
+- Deep SORT Realtime
 
 Install with:
 ```bash
