@@ -1,10 +1,6 @@
-# Ignore script not used
+# Ignore assets not used
 Misc
-src/test_MPS
-src/DroneMain_copy
-src/DroneMain_tanishq
 yolov8n.pt
-
 
 # Ignore system files
 .DS_Store
