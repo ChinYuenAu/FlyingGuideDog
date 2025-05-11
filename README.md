@@ -20,9 +20,7 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 
 | DJI Tello EDU                                 | ArUco marker                                      |
 |---------------------------------------------- |---------------------------------------------------|
-|<img src="figs/DJI_Tello_EDU.JPG" width="200"> |<img src="figs/ArUco_6x6_1000-50.svg" width="200"> |
-
-
+|<img src="assets/DJI_Tello_EDU.JPG" width="200"> |<img src="assets/ArUco_6x6_1000-50.svg" width="200"> |
 
 ## 🚀 Features
 
@@ -35,6 +33,14 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 | 🔄 **Dynamic Turn Handling**     | Adjusts drone behavior based on yaw angle changes (turns) to minimize corner collisions |
 | 🧠 **State-Aware Logic**         | Transitions between tracking modes (ArUco vs fallback) and obstacle override |
 | 🖥️ **Live Video + Debug UI**     | Real-time annotations: marker box, yaw angle, fallback IDs, obstacle warnings |
+
+## 🧪 Example Output
+
+
+| Drone Camera View <br/> BGR Frame(Left), Depth Map (Right)  | Third person point of view |
+|-------------------------------------------------------- |--------------------------- |
+| <img src="assets/TrackingScreenshot.png" width="500">     | <img src="assets/RouteView_RoomExitAndNavigation.png" width="500"> | 
+| <img src="assets/TrackingScreenshot2.png" width="500">    | <img src="assets/RouteView_CorridorNavigation.png" width="500"> | 
 
 ## 📂 Repository Structure
 
@@ -112,16 +118,6 @@ pip install -r requirements.txt
 | `l` | Land               |
 | `q` | Emergency Quit     |
 
-## 🧪 Example Output
-
-
-| Drone Camera View <br/> BGR Frame(Left), Depth Map (Right)  | Third person point of view |
-|-------------------------------------------------------- |--------------------------- |
-| <img src="figs/TrackingScreenshot.png" width="500">     | <img src="figs/RouteView_RoomExitAndNavigation.png" width="500"> | 
-| <img src="figs/TrackingScreenshot2.png" width="500">    | <img src="figs/RouteView_CorridorNavigation.png" width="500"> | 
-
-
-
 ## 💡 Lessons Learned
 
 - Accurate yaw angle from ArUco is critical for understanding user turns
@@ -135,38 +131,18 @@ pip install -r requirements.txt
 - Integrating LLM voice assistant for verbal guidance  
 - Exploring stereo/depth camera module to replace MiDaS  
 
+## 🛠️ Replacing drone motor without soldering
+
+Replacing a damaged or worn-out motor on the DJI Tello EDU can be done without soldering, making it more accessible for beginners and faster for prototyping.
+The visual guide below outlines each step, enabling quick motor swaps using only basic tools.
+
+|    Identifying the correct motor orientation     | Clockwise (Blue/Black) or <br/> Counter-clockwise(White/Black)| 
+| ----------------------------------------------   | ------------------------------------------------           |
+|<img src="assets/replace_motor1.jpg" width="200"> | <img src="assets/replace_motor2.jpg" width="200">          |
+| Reconnecting wires with <br/> staggered lengths to prevent short circuits | Securing wires with non-conductive tape | 
+|<img src="assets/replace_motor3.jpg" width="200"> | <img src="assets/replace_motor4.jpg" width="200">          |
+
 ## 👨‍🏫 Acknowledgements
 
 This project is part of a research initiative at Northeastern University under the guidance of Prof. Ilmi Yoon and Prof Jeongkyu Lee.  
 Special thanks to DJI Tello EDU SDK and open-source contributions from MiDaS, Deep SORT, and Ultralytics.
-
-
-
-
-## Functions description 
-
-track_aruco_marker()
-- Detect ArUco markers and track with marker memory, i.e. last_marker_direction, last_marker_position, last_marker_time. Return True if marker found.
-
-track_obj()
-- Control yaw, left/right, front/back, up/down movement using PD controllers based on the marker's position and area
-
-detect_obstacle()
-- Detect obstacles in the drone's path using Canny edge detection and contour analysis by dividing the frame into regions with proximity information.
-
-avoid_obstacle()
-- Avoid obstacles by sending RC commands with speed adjustments based on proximity information from different regions.
-
-search_memory()
-- Search for ArUco marker using memory of its last known position and direction.
-
-capture_frames()
-- State machine to control the drone's behavior based on the current mode and detected obstacles by continuously capturing frames and listening for key presses
-
-## 🛠️ Replacing drone motor without soldering
-
-| Identify the right motor (CCW/Clockwise)       | Connect wires at different lengths to avoid shortcut | 
-| ---------------------------------------------- | ------------------------------------------------     |
-|<img src="figs/replace_motor1.jpg" width="300"> | <img src="figs/replace_motor2.jpg" width="300">      |
-| Put wires back                                 | Tape the wires                                       | 
-|<img src="figs/replace_motor3.jpg" width="300"> | <img src="figs/replace_motor4.jpg" width="300">      |
