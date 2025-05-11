@@ -110,7 +110,7 @@ pip install -r requirements.txt
 ## 🧪 Example Output
 
 
-| Drone Camera View - BGR Frame(Left), Depth Map (Right)  | Third person point of view |
+| Drone Camera View <br/> BGR Frame(Left), Depth Map (Right)  | Third person point of view |
 |-------------------------------------------------------- |--------------------------- |
 | <img src="figs/TrackingScreenshot.png" width="500">     | <img src="figs/RouteView_RoomExitAndNavigation.png" width="500"> | 
 | <img src="figs/TrackingScreenshot2.png" width="500">    | <img src="figs/RouteView_CorridorNavigation.png" width="500"> | 
