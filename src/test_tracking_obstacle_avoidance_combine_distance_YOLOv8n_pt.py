@@ -465,9 +465,9 @@ def detect_obstacle(frame, prev_obs_centers,
     cv2.putText(frame, height_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
     battery_text = f"Battery: {tello.get_battery()}%" if tello.get_battery() != -1 else "Battery: N/A"
     cv2.putText(frame, battery_text, (10, h_frame - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2) 
-    # speed_text = f"X-Asis Speed: {tello.get_speed_x()} cm/s" if tello.get_speed_x() != -1 else "Speed: N/A"
-    # cv2.putText(frame, speed_text, (10, h_frame - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-
+    speed_text = f"X-Asis Speed: {tello.get_state_field('vgx')} cm/s" if tello.get_state_field('vgx') != -1 else "Speed: N/A"
+    cv2.putText(frame, speed_text, (10, h_frame - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+    
     # -------------------------------
     # Compute YOLO-based lateral avoidance (for dynamic obstacles)
     # -------------------------------
