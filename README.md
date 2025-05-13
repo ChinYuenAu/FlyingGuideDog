@@ -1,9 +1,6 @@
-
-# 👨‍💻 Flying Guide Dog: Real-Time Indoor Navigation Drone 🤖
+# 👨‍💻Indoor Navigation Drone with Real-Time Person Tracking and Obstacle Avoidance  🤖
 
 ## 📌 Project Overview
-
-**Autonomous Drone-Based User Tracking with Obstacle Avoidance**  
 Project Goal: This project focuses on the core real-time navigation system for a future **“Flying Guide Dog”**—an assistive drone designed to help visually impaired individuals navigate complex indoor environments safely and autonomously.
 
 This work delivers:
