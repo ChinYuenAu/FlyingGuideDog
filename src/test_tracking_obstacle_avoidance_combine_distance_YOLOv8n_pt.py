@@ -334,11 +334,6 @@ def detect_obstacle(frame, prev_obs_centers,
     
     Parameters:
         frame                    : Current video frame from the drone's camera
-        model                    : YOLO model for object detection
-        tracker                  : DeepSort tracker for tracking detected objects
-        midas                    : MiDaS model for depth estimation
-        transform                : Preprocessing pipeline for MiDaS
-        device                   : Device to run the models on (CPU/MPS/GPU)
         prev_obs_centers         : Dictionary storing previous obstacle centers to filter fast-moving objects
         yolo_scaling             : Scaling factor for YOLO-based lateral avoidance
         depth_threshold          : Threshold for depth estimation to detect obstacles
