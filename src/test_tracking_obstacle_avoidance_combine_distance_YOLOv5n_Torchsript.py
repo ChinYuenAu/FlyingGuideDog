@@ -93,7 +93,7 @@ prev_lr = 0                                                                     
 pError_dist = 0                                                                               # forward/backward (distance) previous error
 marker_width_cm = 9.4                                                                         # Adjust to your marker's actual width(cm)
 BASE_TARGET_DISTANCE_CM = 120                                                                 # Target distance from the camera to the marker in cm 
-TURN_TARGET_DISTANCE_CM = 60                                                                  # Reduce radius of the turn
+TURN_TARGET_DISTANCE_CM = 80                                                                  # Reduce radius of the turn
 
 # For marker memory
 last_marker_direction = None
@@ -206,7 +206,8 @@ def track_aruco_marker(frame):
     return marker_found, (lr, fb, ud, yaw)                                                        # Return marker found status and tracking info
 
 
-def trackObj(marker_center, marker_distance, frame, pid_x, pid_y, pError_x, pError_y, yaw_marker, dt=0.1):
+
+def trackObj(marker_center, marker_distance, frame, yaw_marker, dt=0.1):
     """
     PD Controller for marker centering and distance control.
 
@@ -225,164 +226,116 @@ def trackObj(marker_center, marker_distance, frame, pid_x, pid_y, pError_x, pErr
         new_pError_x, new_pError_y : Updated previous errors for the next iteration
         lr, fb, ud, yaw            : Control commands for left/right, forward/backward, up/down, and yaw
     """ 
-    global prev_fb, pError_dist, prev_yaw, prev_lr
+    global prev_fb, prev_yaw, prev_lr, pError_dist, pError_x, pError_y, pid_x, pid_y
+
     x, y = marker_center
-    frame_height, frame_width, _ = frame.shape                                                # Get the current frame's dimensions
-    
+    frame_h, frame_w, _ = frame.shape                                                         # Get the current frame's dimensions
+
     # ----- Horizontal (Yaw) control -----
-    error_x = x - (frame_width // 2)                                                          # Error between the center of the marker and the center of the frame
-    dError_x = (error_x - pError_x) / dt                                                      # derivative of horizontal error over time            
-    yaw_pixel = pid_x[0] * error_x + pid_x[2] * dError_x                                      # PD control for yaw rotation    
+    error_x = x - (frame_w // 2)                                                              # Error between the center of the marker and the center of the frame
+    dError_x = (error_x - pError_x) / dt                                                      # derivative of horizontal error over time, assuming constant dt for simplicity
+    yaw_pixel = pid_x[0] * error_x + pid_x[2] * dError_x                                      # PD control for pixel-based yaw rotation  
 
     # ----- Vertical (Up/Down) control -----
-    # Use the frame's height (global frame variable) for vertical error
-    error_y = (frame_height // 2) - y                                                         # Positive error if marker is above the center, negative if below; In OpenCV, the y-axis increases downwards
+    error_y = (frame_h // 2) - y                                                              # Positive error if marker is above the center, negative if below; In OpenCV, the y-axis increases downwards
     dError_y = (error_y - pError_y) / dt                                                      # derivative of vertical error over time
-    ud = pid_y[0] * error_y + pid_y[2] * dError_y                                             # PD control for up/down movement
+    ud = pid_y[0] * error_y + pid_y[2] * dError_y                                             # PD control for pixel-based vertical control
 
-    # ----- Marker rotation control -----
-    yaw_deg = np.degrees(yaw_marker)  # Convert once for reuse
-    if abs(yaw_deg) < 10:
-        yaw_marker = 0.0  # Treat as non-turning
-        yaw_deg = 0.0
-    # Define thresholds for pre-turn and full turn (e.g., hallway cornering)
-    pre_turning = 10 <= abs(yaw_deg) < 20    # Early signs of actual turn
-    turning     = abs(yaw_deg) >= 20        # Confident the user is turning (e.g., doorway exit or hallway corner)
-    print(f"[DEBUG] yaw_marker={yaw_deg:.1f}°, turning={turning}, pre_turning={pre_turning}")
-
-    # ----- Forward/Backward control -----   
-    # Reduce the target distance if the marker is turning
-    TARGET_DISTANCE_CM = (
-        0.5 * BASE_TARGET_DISTANCE_CM + 0.5 * (TURN_TARGET_DISTANCE_CM if turning or pre_turning else BASE_TARGET_DISTANCE_CM)
-    )
-    print(f"[DEBUG] TARGET_DISTANCE_CM={TARGET_DISTANCE_CM:.1f} cm")
-
+    # ----- Turning classification -----
+    yaw_deg = np.degrees(yaw_marker)                                                          # Convert the yaw angle from radians to degrees for easier interpretation
+    turning = abs(yaw_deg) >= 6                                                               # Turning if yaw angle is greater than or equal to 8 degrees
+   
+    # ----- Dynamic forward/backward control ----- 
+    TARGET_DISTANCE_CM = TURN_TARGET_DISTANCE_CM if turning else BASE_TARGET_DISTANCE_CM      # Smaller target distance when turning to reduce turn radius
     err_d = marker_distance - TARGET_DISTANCE_CM                                              # positive error if farther than target distance, negative if closer
     dErr_d = (err_d - pError_dist) / dt                                                       # derivative of distance error over time
-    kp_d = 0.3 if turning else 0.25                                          # Proportional gain for fb (increase this value to increase the speed of convergence to the target distance)                        
+    kp_d = 0.3 if turning else 0.25                                                           # Proportional gain for fb (increase this value to increase the speed of convergence to the target distance)                        
     kd_d = 0.06 if turning else 0.04                                                          # Derivative gain for fb (increase this value to reduce oscillations by reacting to the rate of change of the error)
-    fb_dynamic = kp_d * err_d + kd_d * dErr_d                                                 # Dynamic forward/backward speed based on distance error
-    pError_dist = err_d                                                                       # Update previous distance error for the next iteration
-    
-    # ----- Forward/Backward Deadzone & minimum speed -----
-    min_speed = 10  
-    fb = 0 if abs(err_d) < 5 else fb_dynamic if abs(fb_dynamic) >= min_speed else np.sign(fb_dynamic) * min_speed  
+    if dErr_d > 0:
+        kp_d *= 1.2 if turning else 1.3                                                       # Boost kp_d for forward acceleration if user speeds up, getting away from drone
+    fb = kp_d * err_d + kd_d * dErr_d                                                         # Dynamic forward/backward speed based on distance error
 
-    # ----- Clip early, to prevent explosive swing ----- 
-    if abs(err_d) > 40:
-        yaw_pixel *= 0.5
-    yaw_pixel = np.clip(yaw_pixel, -40, 40)                                                   
+    # ----- Marker-based correction (yaw/lr from yaw_marker) -----
+    yaw_scale = 1.2 + min(err_d / 100, 0.8) if turning else 0.4
+    lr_scale  = 1.3 + min(err_d / 100, 0.7) if turning else 0.6
+    yaw_marker_corr = yaw_deg * yaw_scale
+    lr_marker_corr = -yaw_deg * lr_scale
+    # yaw_marker_corr = yaw_deg * (1.0 if turning else 0.4)
+    # lr_marker_corr = -yaw_deg * (1.2 if turning else 0.6)                                     # When user turns right, drone should move left to maintain alignment with the marker                                                
 
-    # ----- Adaptive Scaling and Damping -----
-    if turning:                                                                               # Aggressive damping if turning, cautious if far away from target distance, normal otherwise      
-        yaw_marker_gain = 14
-        lr_marker_gain = 26
-        damping_factor = 1.2
-    elif pre_turning:           # warmup zone
-        yaw_marker_gain = 10     
-        lr_marker_gain = 22
-        damping_factor = 1.15
-    else:
-        yaw_marker_gain = 4
-        lr_marker_gain = 10
-        if abs(err_d) > 30:
-            damping_factor = 0.4
-        else:
-            damping_factor = 1.0            
-
-    curve_scale = min(max(marker_distance / 130.0, 1.0), 1.8)                                 # Wider arc if drone farther away from user
-    
-    pixel_weight = 0.2 if (turning or pre_turning) else (0.3 if abs(err_d) > 40 else 1.0)                                         # Reduce pixel influence and emphasize marker influence if significant marker rotation 
-    marker_weight = 1.8 if (turning or pre_turning) else 1.0
-
-    # Combine pixel-based control and marker-based control
-    yaw_marker_corr = marker_weight * damping_factor * yaw_marker_gain * yaw_marker * curve_scale
-    lr_marker_corr = marker_weight * damping_factor * lr_marker_gain * -yaw_marker * curve_scale     
-    lr_pixel = 0.18 * error_x + 0.03 * dError_x                                           # was 0.12, 0.02 
-    if abs(error_x) < 20:
+    # ----- Pixel-based correction -----
+    lr_pixel = 0.18 * error_x + 0.03 * dError_x                                               # was 0.12, 0.02 
+    if abs(error_x) < 15:
         lr_pixel = 0
-    elif abs(err_d) < 30:
-        lr_pixel *= 0.4
+    if turning:
+        yaw_pixel *= 1.4
+        lr_pixel *= 1.2
 
-    # Reduce lr_marker_corr influence when yaw_marker is tiny
-    if not (turning or pre_turning):
-        if abs(yaw_marker) < np.radians(4):
-            lr_marker_corr = 0
+    # ----- Blended control for yaw and lateral control -----
+    if turning:                              
+        yaw = 0.5 * yaw_pixel + 0.5 * yaw_marker_corr                                  
+        lr = 0.45 * lr_pixel + 0.55 * lr_marker_corr                                          # Marker correction are more meaningful than frame center offset when user turns          
+    else:
+        yaw = 0.8 * yaw_pixel + 0.2 * yaw_marker_corr                                         # Rely more on pixel difference
+        if abs(error_x) > 80:
+            lr = 0.85 * lr_pixel + 0.15 * lr_marker_corr                                      # Pixel difference gives more directional info when user is not turning his body (was 0.6, 0.4)
         else:
-            lr_marker_corr *= 0.3  # damp it further
+            lr = 0.7 * lr_pixel + 0.3 * lr_marker_corr                                            
 
-    # Blend pixel-based and marker-based control
-    if turning or pre_turning:                                                              
-        lr = lr_marker_corr                                                                   # Aggressive marker yaw-based turn
-    elif pre_turning:
-        lr = 0.3 * lr_pixel + 0.7 * lr_marker_corr
+    # ----- Low-pass filter to smooth the command -----                                       # Lower values for more smoothing, higher values for more responsiveness
+    if dErr_d > 0:
+        alpha_fb = 0.6 if turning else 0.4
+        alpha_yaw = 0.9 if turning else 0.6
+        alpha_lr = 0.9 if turning else 0.6
     else:
-        lr = 0.6 * lr_pixel + 0.4 * lr_marker_corr                                            # walking straight/stand still, was 0.4, 0.6
- 
-    if not turning and not pre_turning:                                                       # if not turning or pre-turning, use pixel-based control only
-        yaw = yaw_pixel                                                                       
-    else:
-        # Combine marker yaw correction and pixel offset correction
-        yaw = yaw_pixel * pixel_weight + yaw_marker_corr
-                                                                    
-    # ----- Low-pass filter to smooth the command -----
-    alpha_lr = 0.3 if abs(err_d) > 30 else 0.6                                                # Smoothing factor (adjust as needed between 0 and 1); lower value give more smoothing
-    alpha_fb = 0.6
-    alpha_yaw = 0.6
-
-    if turning or pre_turning:
-        alpha_lr = 0.1
-        alpha_fb = 0.2
-        alpha_yaw = 0.2
-
+        alpha_fb = alpha_yaw = alpha_lr = 0.2
     fb = alpha_fb * fb + (1 - alpha_fb) * prev_fb                            
     yaw = alpha_yaw * yaw + (1 - alpha_yaw) * prev_yaw
     lr  = alpha_lr * lr  + (1 - alpha_lr) * prev_lr
-    prev_fb, prev_yaw, prev_lr = fb, yaw, lr
 
-    # ----- Stability gate for vertical control -----
-    if abs(err_d) < 10 and abs(error_y) < 30:
-        ud = 0
-
-    # ----- Turning override from steady state -----
-    if abs(err_d) < 15:
-        if turning or pre_turning:
-            # Responsive override: react fast when turning
-            lr = lr_marker_corr                                                               # Only marker yaw-based control for lr; pixel offset ignored
-            yaw = yaw_pixel * pixel_weight + yaw_marker_corr
-        else:
-            # Hold position, suppress jitter
-            lr *= 0.4
-            yaw *= 0.4
+    # ----- Prevent moving forward until aligned laterally -----
+    if turning:
+        misalign = max(abs(yaw), abs(lr))
+        if misalign < 6:
+            fb *= 0.3
+        elif misalign < 12:
+            fb *= 0.6
+        # Additional braking if marker suddenly drifts sideways fast
+        if abs(error_x) > 60 and abs(dError_x) > 20:
+            fb *= 0.5
+    else:
+        if marker_distance < 200 and abs(error_x) > 100:
             fb = 0
-    elif abs(err_d) < 20:
-        lr  *= 0.7
-        yaw *= 0.7
 
-    # ---- Anti-oscillation logic ----
-    if not (turning or pre_turning) and (np.sign(error_x) != np.sign(pError_x)) and abs(err_d) < 10:
-        yaw = 0
-        lr = 0
-    if not (turning or pre_turning) and (np.sign(error_y) != np.sign(pError_y)) and abs(err_d) < 5:
-        ud = 0
+    # ----- Stability gates (close range dampening) -----
+    if not turning and dErr_d <= 0:                                                           # approaching marker, dErr_d <= 0(deceleration)
+        if abs(err_d) < 5: 
+            lr, fb, ud, yaw = 0, 0, 0, 0 
+        elif abs(err_d) < 30:
+            yaw *= 0.5
+            lr *= 0.5
+            fb *= 0.2
+            if abs(error_x) < 30:
+                yaw = 0
+                lr = 0
 
     # ---- Dynamic clipping ----
-    yaw = int(np.clip(yaw, -20, 20)) if abs(err_d) < 10 else int(np.clip(yaw, -45, 45))       # Clip yaw to a smaller range if close to the target distance
     lr  = int(np.clip(lr, -30, 30)) if abs(err_d) < 10 else int(np.clip(lr, -35, 35))         # Clip lr to a smaller range if close to the target distance
-    fb = np.clip(fb, -60 + 0.2 * abs(error_x), 60 - 0.3 * abs(error_x))                       # Prevent forward thrust from overpowering correction
-    ud = int(np.clip(ud, -30, 30))                                                            # Clip the speed to the Tello's limits (typically -100 to 100)     
+    # fb = np.clip(fb, -60 + 0.2 * abs(error_x), 60 - 0.2 * abs(error_x))                       # Encourages forward movement only when marker is centered, otherwise prioritizes re-centering before advancing
+    fb = np.clip(fb, -50 + 0.1 * error_x**2 / 50, 50 - 0.1 * error_x**2 / 50)                 # 
+    ud = int(np.clip(ud, -45, 45))                                                            # Clip the speed to the Tello's limits (typically -100 to 100)     
+    yaw = int(np.clip(yaw, -20, 20)) if abs(err_d) < 10 else int(np.clip(yaw, -45, 45))       # Clip yaw to a smaller range if close to the target distance
 
-    print(f"[DEBUG] error_x={error_x}, error_y={error_y}, err_d = {err_d:.2f}, lr={lr}, fb={fb}, ud={ud}, yaw={yaw}")  # Print debug info
-    print(f"[DEBUG] yaw_marker={yaw_marker:.3f} rad, yaw_marker_corr={yaw_marker_corr:.2f}")
-    print(f"[DEBUG] gains: yaw_gain={yaw_marker_gain}, lr_gain={lr_marker_gain}, pixel_weight={pixel_weight:.2f}")
+    prev_lr, prev_fb, prev_yaw, pError_dist = lr, fb, yaw, err_d
 
-    # Command format: left/right, forward/backward, up/down, yaw)
-    # return the current errors and commands                         
-    return error_x, error_y, lr, fb, ud, yaw                                                
+    print(f"[STATE] Marker_Dist={marker_distance:.1f}cm, Target_Dist={TARGET_DISTANCE_CM}cm, lr={lr}, fb={int(fb)}, ud={ud}, yaw={yaw}")
+    print(f"[DEBUG] error_x={error_x}, error_y={error_y}, err_d = {err_d:.2f}, dErr_d = {dErr_d:.2f}")
+    print(f"[DEBUG] yaw_marker={yaw_deg:.1f}°, turning={turning}, yaw_marker_corr={yaw_marker_corr:.2f}, lr_marker_corr={lr_marker_corr:.2f}")
+
+    return error_x, error_y, lr, fb, ud, yaw     
 
 
-
-def detect_obstacle(frame, model, tracker, midas, transform, device, prev_obs_centers,
+def detect_obstacle(frame, prev_obs_centers,
                     yolo_scaling=0.1, depth_threshold=0.25, depth_scaling=100, obstacle_speed_threshold=20, min_bbox_area=15000, deadband=2):
     """
     Detect obstacles using YOLO, DeepSort, and MiDaS depth estimation.
@@ -407,7 +360,7 @@ def detect_obstacle(frame, model, tracker, midas, transform, device, prev_obs_ce
         avoid_roll : Lateral command for obstacle avoidance
     """
 
-    global last_avoid_roll
+    global last_avoid_roll, model, tracker, midas, transform, device
 
     h_frame, w_frame, _ = frame.shape
     center_x, center_y = w_frame // 2, h_frame // 2
@@ -767,34 +720,45 @@ def search_with_memory(last_marker_position, last_marker_direction, last_marker_
 def main():
     global flying, quit_program, last_marker_direction, last_marker_position, last_marker_time
 
+    if 'frame_times' not in main.__dict__:
+        main.frame_times = []
+
     try:
         while True:
+            total_start = time.time()
             lr = fb = ud = yaw = 0
             avoid_roll = 0
 
-            # Get the current frame from Tello
+            # ----- Frame acquisition and preprocess -----
+            t0 = time.time()
             frame = frame_reader.frame
             if frame is None or frame.size == 0:                                             # rare blank frames, skip
                 continue                                                                      
-            # Correct the frame for camera distortion
             frame = cv2.undistort(frame, camera_matrix, dist_coeffs)
             frame = cv2.resize(frame, (640, 480))                
+            t1 = time.time()
+            print(f"[TIMER] Frame preprocess: {(t1 - t0) * 1000:.1f} ms")
 
             if flying:
-                # Track ArUco Marker
+                # ----- Track ArUco Marker -----
+                t2 = time.time()
                 marker_found, (lr, fb_marker, ud, yaw) = track_aruco_marker(frame)
+                t3 = time.time()
+                print(f"[TIMER] ArUco tracking: {(t3 - t2) * 1000:.1f} ms")
 
-                # Detect obstacles and get roll command
+                # ----- Detect obstacles and get roll command -----
+                t4 = time.time()
                 avoid_roll, current_tracks, track_classes = detect_obstacle(frame, scripted_model, tracker, midas, transform, device, prev_obs_centers)
+                t5 = time.time()
+                print(f"[TIMER] Obstacle detection: {(t5 - t4) * 1000:.1f} ms")
 
-                # Merge logic: prioritize obstacle avoidance over marker tracking
+                # ----- Control logic: prioritize obstacle avoidance over marker tracking -----
+                t6 = time.time()
                 if avoid_roll != 0:
-                    # Obstacle avoidance has the highest priority
                     print("Obstacle detected! Avoiding...")
                     fb_avoid = max(10, int(0.5 * fb_marker))                                 # Adjust forward speed based on marker tracking
                     rc = (int(avoid_roll), int(fb_avoid), 0, int(yaw))                       # Roll command for obstacle avoidance
                 elif marker_found:
-                    # Use ArUco marker when available
                     print("ArUco Marker found! Tracking...")
                     rc = (int(lr), int(fb_marker), int(ud), int(yaw))
                 else:
@@ -809,38 +773,49 @@ def main():
                         # If no marker and no person found, search using last known marker position and direction 
                         print("No marker found and no fallback available. Searching...")
                         rc = search_with_memory(last_marker_position, last_marker_direction, last_marker_time, marker_memory_timeout)
-            
-                # Send RC control commands to Tello
+                t7 = time.time()
+                # print(f"[TIMER] Decision logic: {(t7 - t6) * 1000:.1f} ms")    
+
+                # ----- Send RC commands to Tello -----
                 tello.send_rc_control(*rc)
                 print("rc command format: left/right, forward/backward, up/down, yaw)")
             
             else:
-                # Idle preview
+                # ----- Display start frame when not airborne yet -----
                 idle = frame.copy()
-                # Display the start frame if the drone is not airborne
                 cv2.putText(idle, "Press 's' to takeoff", (10, 30), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
                 cv2.imshow("Idle Preview", idle)
+
+            # ----- End of loop timing -----
+            total_end = time.time()
+            frame_time = (total_end - total_start) * 1000
+            main.frame_times.append(frame_time)
+            if len(main.frame_times) > 30:
+                main.frame_times.pop(0)
+            avg_fps = 1000.0 / (sum(main.frame_times) / len(main.frame_times))
+            print(f"[INFO] Total Frame Latency: {frame_time:.2f} ms, Average FPS: {avg_fps:.2f}")
+            print("------------------------------------------------------------------------------------------------------------------")
 
             key = cv2.waitKey(1) & 0xFF
             if key == ord('s') and not flying:
                 cv2.destroyWindow("Idle Preview")
                 try:
                     tello.takeoff()
-                    # for i in range(3):                                                            # Wait for Tello to stabilize
-                    #     print(f"wait for 3 seconds for Tello to stabilize, {i+1} ...")
-                    #     time.sleep(1)
                     height = tello.get_height()
                     print(f"Drone height after takeoff: {height}")
                 except Exception as e:
                     print(f"[ERROR] Takeoff failed: {e}")
 
                 tello.send_rc_control(0, 0, 30, 0)                                            # Ascend for 20 cm     
-                for i in range(3):                                                            # Wait for Tello to stabilize
-                        print(f"wait for 3 seconds for Tello to stabilize, {i+1} ...")
+                for i in range(2):                                                            # Wait for Tello to stabilize
+                        print(f"wait for 2 seconds for Tello to stabilize, {i+1} ...")
                         time.sleep(1)
                 height = tello.get_height()
-                print(f"Drone height: {height}")                                                    
+                print(f"Drone height: {height}")
+                for _ in range(2):                                                            # Wait for Tello to stabilize
+                    print(f"wait for 1 seconds for Tello to stabilize, {_+1} ...")
+                    time.sleep(1)                                                            
                 flying = True
                 print("Flying flag:", flying)
             elif key == ord('l') and flying:

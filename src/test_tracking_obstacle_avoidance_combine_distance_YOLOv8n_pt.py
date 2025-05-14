@@ -467,7 +467,7 @@ def detect_obstacle(frame, prev_obs_centers,
     cv2.putText(frame, battery_text, (10, h_frame - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2) 
     speed_text = f"X-Asis Speed: {tello.get_state_field('vgx')} cm/s" if tello.get_state_field('vgx') != -1 else "Speed: N/A"
     cv2.putText(frame, speed_text, (10, h_frame - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-    
+
     # -------------------------------
     # Compute YOLO-based lateral avoidance (for dynamic obstacles)
     # -------------------------------
@@ -795,7 +795,7 @@ def main():
 
                 tello.send_rc_control(0, 0, 30, 0)                                            # Ascend for 30 cm     
                 for i in range(2):                                                            # Wait for Tello to ascend
-                        print(f"wait for 1 seconds for Tello to ascend, {i+1} ...")
+                        print(f"wait for 2 seconds for Tello to ascend, {i+1} ...")
                         time.sleep(1)
                 height = tello.get_height()
                 print(f"Drone height: {height}")
