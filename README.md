@@ -125,8 +125,9 @@ pip install -r requirements.txt
 ## 📈 Future Work
 
 - Replacing fallback tracking with person re-ID for long occlusion handling  
-- Integrating LLM voice assistant for verbal guidance  
-- Exploring stereo/depth camera module to replace MiDaS  
+- Integrating LLM voice assistant for verbal guidance
+- Incorporating complex models for semantic scene understanding
+- Enhancing hardware such as extra cameras or proximity sensors for improved spatial awareness
 
 ## 🛠️ Replacing drone motor without soldering
 
