@@ -1,11 +1,12 @@
 # 👨‍💻Indoor Navigation Drone with Real-Time Person Tracking and Obstacle Avoidance  🤖
 
+Author: Au, Chin Yuen (Isaac)
+
 ## 📌 Project Overview
 Project Goal: This project focuses on the core real-time navigation system for a future **“Flying Guide Dog”**—an assistive drone designed to help visually impaired individuals navigate complex indoor environments safely and autonomously.
 
 This work delivers:
 - **Reliable person-following** via ArUco marker tracking  
-- **Fallback visual tracking** using YOLOv5 + Deep SORT when the marker is lost  
 - **Monocular obstacle avoidance** powered by MiDaS depth estimation  
 - **Smooth PD control** for stable and responsive flight behavior
 
@@ -24,15 +25,13 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 | Component                        | Description |
 |----------------------------------|-------------|
 | 🎯 **ArUco Marker Tracking**     | Primary tracking system using marker pose (position + yaw angle) |
-| 🔄 **Fallback Tracking**         | YOLOv5n + Deep SORT person tracking when ArUco tag is lost |
 | 🛑 **Obstacle Avoidance**        | MiDaS depth estimation + spatial logic for halting or rerouting |
 | 📡 **PD Control**                | Smooth real-time drone control across yaw, up/down, forward/backward, and lateral axes |
 | 🔄 **Dynamic Turn Handling**     | Adjusts drone behavior based on yaw angle changes (turns) to minimize corner collisions |
-| 🧠 **State-Aware Logic**         | Transitions between tracking modes (ArUco vs fallback) and obstacle override |
-| 🖥️ **Live Video + Debug UI**     | Real-time annotations: marker box, yaw angle, fallback IDs, obstacle warnings |
+| 🧠 **State-Aware Logic**         | Transitions between ArUco tracking mode and obstacle avoidance override |
+| 🖥️ **Live Video + Debug UI**     | Real-time annotations: marker box, yaw angle, fallback IDs, obstacle warnings, depth map |
 
 ## 🧪 Example Output
-
 
 | Drone Camera View <br/> BGR Frame(Left), Depth Map (Right)  | Third person point of view |
 |-------------------------------------------------------- |--------------------------- |
@@ -45,9 +44,7 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 .
 ├── assets/                                         # Example outputs, evaluation images, logs
 ├── src/
-|   ├──test_tracking_obstacle_avoidance_combine.py  # Unified control script
-├── models/
-│   ├── yolov5n.torchscript                         # Lightweight YOLOv5n model
+|   ├──droneMain_MiDaS.py                                # Unified control script
 ├── README.md
 ├── requirements.txt
 ```
@@ -55,26 +52,24 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 ## 🧠 Methodology
 
 ### 1. **ArUco Marker Detection**
-- Pose estimation: `cv2.aruco.estimatePoseSingleMarkers`
+- Marker detector: `cv2.aruco.ArucoDetector.detectMarkers`
+- Pose estimation: `cv2.solvePnP`
 - Extracts marker center, distance, and yaw angle from `rvec` + `tvec`
 - Used to derive control commands:
   - `yaw` → align heading with marker angle
   - `lr`  → lateral correction
   - `fb`  → forward-backward distance control
   - `ud`  → altitude stabilization
-
-### 2. **Fallback Tracking: YOLO + Deep SORT**
-- Activates when marker is lost for > N frames
-- Uses the nearest "person" bounding box based on last known ArUco position
 - Maintains smooth control using visual tracking and position memory
 
-### 3. **Obstacle Avoidance**
+### 2. **Obstacle Avoidance**
 - Uses MiDaS to generate depth maps
 - Computes mean depth and depth gradient near path line
 - If obstacle detected < threshold distance, halts or redirects
 - Obstacle override has highest priority
+- Assume obstacle apperance on sides as this project focuses on target tracking
 
-### 4. **PD Controller with Smoothing**
+### 3. **PD Controller with Smoothing**
 - Stabilizes drone motion via proportional-derivative control
 - Smooths jitter using:
   - Low-pass filtering
@@ -86,14 +81,12 @@ By **empowering entry-level drones** with advanced autonomous behavior, this pro
 | Metric                             | Value / Notes |
 |-----------------------------------|----------------|
 | ArUco Tracking Latency            | ~7 ± 1 ms                              |
-| Obstacle Detection Recall         | ~90% (≥0.7 IoU on 1200 labeled frames) |
-| End-to-End Avoidance Success      | 85% of 40 indoor corner runs           |
+| End-to-End Avoidance Success      | 90% of 30 indoor corner runs           |
 | Turn Responsiveness               | Drone reduces radius and accelerates during sharp marker yaw changes |
 | Stability                         | Controlled oscillation with PID smoothing and min-speed gating       |
 
 ## 🕹️ Requirements
-This project is tested on MacBook M1 Pro. The following libraries and frameworks are required:
-
+This project is tested on Apple M1 Pro chip. The following libraries and frameworks are required:
 - Python 3.10+
 - OpenCV
 - NumPy
