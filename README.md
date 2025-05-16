@@ -113,7 +113,7 @@ Future work includes
 - hardware enhancement such as extra cameras or proximity sensors for improved spatial awareness
 - eliminate the usage of visual marker while maintaining performance under dynamic environment
 
-## 🛠️ Replacing drone motor without soldering
+## 🛠️ Appendix: Replacing drone motor without soldering
 
 Replacing a damaged or worn-out motor on the DJI Tello EDU can be done without soldering, making it more accessible for beginners and faster for prototyping.
 The visual guide below outlines each step, enabling quick motor swaps using only basic tools.
