@@ -1,6 +1,7 @@
 # Ignore assets not used
 Misc
 yolov8n.pt
+yolov5n.pt
 
 # Ignore system files
 .DS_Store

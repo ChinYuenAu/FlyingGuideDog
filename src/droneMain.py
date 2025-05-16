@@ -334,6 +334,11 @@ def detect_obstacle(frame, prev_obs_centers,
     
     Parameters:
         frame                    : Current video frame from the drone's camera
+        model                    : YOLO model for object detection
+        tracker                  : DeepSort tracker for tracking detected objects
+        midas                    : MiDaS model for depth estimation
+        transform                : Preprocessing pipeline for MiDaS
+        device                   : Device to run the models on (CPU/MPS/GPU)
         prev_obs_centers         : Dictionary storing previous obstacle centers to filter fast-moving objects
         yolo_scaling             : Scaling factor for YOLO-based lateral avoidance
         depth_threshold          : Threshold for depth estimation to detect obstacles
@@ -460,8 +465,8 @@ def detect_obstacle(frame, prev_obs_centers,
     cv2.putText(frame, height_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
     battery_text = f"Battery: {tello.get_battery()}%" if tello.get_battery() != -1 else "Battery: N/A"
     cv2.putText(frame, battery_text, (10, h_frame - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2) 
-    speed_text = f"X-Asis Speed: {tello.get_state_field('vgx')} cm/s" if tello.get_state_field('vgx') != -1 else "Speed: N/A"
-    cv2.putText(frame, speed_text, (10, h_frame - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+    # speed_text = f"X-Asis Speed: {tello.get_speed_x()} cm/s" if tello.get_speed_x() != -1 else "Speed: N/A"
+    # cv2.putText(frame, speed_text, (10, h_frame - 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
     # -------------------------------
     # Compute YOLO-based lateral avoidance (for dynamic obstacles)
@@ -790,7 +795,7 @@ def main():
 
                 tello.send_rc_control(0, 0, 30, 0)                                            # Ascend for 30 cm     
                 for i in range(2):                                                            # Wait for Tello to ascend
-                        print(f"wait for 2 seconds for Tello to ascend, {i+1} ...")
+                        print(f"wait for 1 seconds for Tello to ascend, {i+1} ...")
                         time.sleep(1)
                 height = tello.get_height()
                 print(f"Drone height: {height}")
