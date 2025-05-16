@@ -85,8 +85,6 @@ This project is tested on Apple M1 Pro chip. The following libraries and framewo
 - NumPy
 - PyTorch
 - djitellopy (DJI Tello SDK)
-- Ultralytics YOLO
-- Deep SORT Realtime
 
 Install with:
 ```bash
