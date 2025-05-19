@@ -120,7 +120,7 @@ pip install -r requirements.txt
     - Avoid excessive lateral oscillation
  
   - Obstacle avoidance Region of Interest(ROI) definition
-    - Monitor only the left and right sides for obstacles based on experimental findings and project nature. Obstalces are not likely to intrude between target user and drone in the middle part of frame
+    - Monitor only the left and right sides for obstacles based on experimental findings and project nature. Obstacles are not likely to intrude between target user and drone in the middle part of frame
     - Full image height and width are not considered to avoid false positive classifications
     - ROI thresholds are empirically calibrated to balance sensitivity—avoiding values that are too little (missing obstacles) or too large (capturing irrelevant outliers)
     - ROI shrinks dynamically at closer distances to account for reduced false positives
