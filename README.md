@@ -119,7 +119,7 @@ pip install -r requirements.txt
     - Achieve tight and responsive navigation around corners and maintain lateral alignment with back of target user by producing oppositely signed yaw and lateral commands – such as peeking left while rotating right
     - Avoid excessive lateral oscillation
  
-  - Obstacle avoidance Region of Interest(ROI) defnition
+  - Obstacle avoidance Region of Interest(ROI) definition
     - Monitor only the left and right sides for obstacles based on experimental findings and project nature. Obstalces are not likely to intrude between target user and drone in the middle part of frame
     - Full image height and width are not considered to avoid false positive classifications
     - ROI thresholds are empirically callibrated to balance sensitivity—avoiding values that are too little (missing obstacles) or too large (capturing irrelevant outliers)
