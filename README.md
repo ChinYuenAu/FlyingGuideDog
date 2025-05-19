@@ -126,6 +126,9 @@ pip install -r requirements.txt
     - ROI shrinks dynamically at closer distances to account for reduced false positives
 
 - Limitations
+  - Performace
+    - Market tracking might be lost if user turns too fast
+
   - Blind spots
     - The drone lacks cameras on its left, right, and rear sides, resulting in limited spatial perception in those directions. Incorporating additional side- and rear-facing cameras or proximity sensors can significantly improve
       environmental awareness and reduce blind zones. 
@@ -147,6 +150,7 @@ Future work includes
 - integrating LLM voice assistant for human interaction
 - hardware enhancement such as extra cameras or proximity sensors for improved spatial awareness
 - eliminate the usage of visual marker while maintaining performance under dynamic environment
+- build a model to learn and tune weights for drone movement
 
 ## 🛠️ Appendix1: Replacing drone motor without soldering
 
