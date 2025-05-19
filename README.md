@@ -67,7 +67,7 @@ This work delivers:
 
 | Metric                             | Value / Notes |
 |-----------------------------------|----------------|
-| ArUco Tracking Latency            | ~7 ± 1 ms                              |
+| Tracking Latency (per frame)      | ~80 ± 5 ms                              |
 | End-to-End Avoidance Success      | 90% of 30 indoor corner runs           |
 | Turn Responsiveness               | Drone reduces radius and accelerates during sharp marker yaw changes |
 | Stability                         | Controlled oscillation with PID smoothing and min-speed gating       |
