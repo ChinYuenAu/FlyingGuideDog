@@ -250,8 +250,6 @@ def trackObj(marker_center, marker_distance, frame, yaw_marker, dt=0.1):
     lr_scale  = 1.3 + min(err_d / 100, 0.7) if turning else 0.6
     yaw_marker_corr = yaw_deg * yaw_scale
     lr_marker_corr = -yaw_deg * lr_scale
-    # yaw_marker_corr = yaw_deg * (1.0 if turning else 0.4)
-    # lr_marker_corr = -yaw_deg * (1.2 if turning else 0.6)                                     # When user turns right, drone should move left to maintain alignment with the marker                                                
 
     # ----- Pixel-based correction -----
     lr_pixel = 0.18 * error_x + 0.03 * dError_x                                               # was 0.12, 0.02 
@@ -310,9 +308,8 @@ def trackObj(marker_center, marker_distance, frame, yaw_marker, dt=0.1):
                 lr = 0
 
     # ---- Dynamic clipping ----
-    lr  = int(np.clip(lr, -30, 30)) if abs(err_d) < 10 else int(np.clip(lr, -35, 35))         # Clip lr to a smaller range if close to the target distance
-    # fb = np.clip(fb, -60 + 0.2 * abs(error_x), 60 - 0.2 * abs(error_x))                       # Encourages forward movement only when marker is centered, otherwise prioritizes re-centering before advancing
-    fb = np.clip(fb, -50 + 0.1 * error_x**2 / 50, 50 - 0.1 * error_x**2 / 50)                 # 
+    lr  = int(np.clip(lr, -30, 30)) if abs(err_d) < 10 else int(np.clip(lr, -35, 35))         # Clip lr to a smaller range if close to the target distance                    
+    fb = np.clip(fb, -50 + 0.1 * error_x**2 / 50, 50 - 0.1 * error_x**2 / 50)                 # Encourages forward movement only when marker is centered, otherwise prioritizes re-centering before advancing
     ud = int(np.clip(ud, -45, 45))                                                            # Clip the speed to the Tello's limits (typically -100 to 100)     
     yaw = int(np.clip(yaw, -20, 20)) if abs(err_d) < 10 else int(np.clip(yaw, -45, 45))       # Clip yaw to a smaller range if close to the target distance
 
@@ -546,13 +543,6 @@ def detect_obstacle(frame, prev_obs_centers,
     if (depth_metric_left < depth_threshold) and (depth_metric_right < depth_threshold):
         avoid_roll_depth = int((depth_error_left - depth_error_right) * depth_scaling)      # Move left or right based on the difference
 
-    # Emphasize depth-based avoidance over YOLO
-    # if avoid_roll_depth != 0:
-    #     avoid_roll = avoid_roll_depth
-    #     print("Avoidance: Depth-based")
-    # else:
-    #     avoid_roll = avoid_roll_yolo
-    #     print(f"Avoidance: YOLO-based, L error={left_error}, R error={right_error}")
     w_depth = 1
     w_yolo = 0
     avoid_roll = int(w_depth * avoid_roll_depth) + int(w_yolo * avoid_roll_yolo)               # Combine depth and YOLO avoidance commands
