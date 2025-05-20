@@ -4,8 +4,8 @@ import numpy as np
 import torch
 import json
 from djitellopy import Tello
-from ultralytics import YOLO
-from deep_sort_realtime.deepsort_tracker import DeepSort
+# from ultralytics import YOLO
+# from deep_sort_realtime.deepsort_tracker import DeepSort
 
 # ----- Camera parameters -----
 Camera_fx = 916.4798394056434                                                                 # Focal lengths in pixels (how much the lens magnifies the image)
@@ -26,7 +26,7 @@ dist_coeffs = np.array([Camera_k1, Camera_k2, Camera_p1, Camera_p2, Camera_k3])
 
 # ----- Load YOLO, Deep SORT Tracker and MiDaS -----
 # model   = YOLO("yolov8n.pt")
-tracker = DeepSort(max_age=20, n_init=3, max_cosine_distance=0.2)
+# tracker = DeepSort(max_age=20, n_init=3, max_cosine_distance=0.2)
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 midas = torch.hub.load("intel-isl/MiDaS", "MiDaS_small", pretrained=True).to(device).eval()   # Load MiDaS_small model via PyTorch Hub to device and set to eval mode
 transform = torch.hub.load("intel-isl/MiDaS", "transforms").small_transform                   # Preprocessing pipeline for MiDaS_small model
