@@ -15,6 +15,15 @@ This work delivers:
 |---------------------------------------------- |---------------------------------------------------|
 |<img src="assets/DJI_Tello_EDU.JPG" width="200"> |<img src="assets/ArUco_6x6_1000-50.svg" width="200"> |
 
+
+| | Presentation Materials  |
+| ------------ | ---------- |
+| Slides | https://docs.google.com/presentation/d/1vAErRwXz4fKOyFAy7Zjih4mDjOXEdM5Q/edit?usp=sharing&ouid=114172766657756283045&rtpof=true&sd=true |
+| Video  | https://youtu.be/KqZ9zE3YTA4?si=ZupoeAJw_0C9F1U0 | 
+
+
+
+
 ## 🚀 Features
 
 | Component                        | Description |
