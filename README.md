@@ -21,10 +21,9 @@ This work delivers:
 | | Presentation Materials  |
 | ------------ | ---------- |
 | Slides | https://docs.google.com/presentation/d/1vAErRwXz4fKOyFAy7Zjih4mDjOXEdM5Q/edit?usp=sharing&ouid=114172766657756283045&rtpof=true&sd=true |
-| Video  | https://youtu.be/KqZ9zE3YTA4?si=ZupoeAJw_0C9F1U0 | 
-
-
-
+| Video  | https://youtu.be/KqZ9zE3YTA4 (Slides Go Through) | 
+|        | https://youtu.be/UmgLiAnHYT0 (Drone Action)| 
+|        | https://youtu.be/aFYV2oo3kuk (Drone Action)|
 
 ## 🚀 Features
 
