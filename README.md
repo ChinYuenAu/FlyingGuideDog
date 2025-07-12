@@ -8,6 +8,13 @@ Project Goal: This project focuses on the core real-time navigation system for a
 Conventional drone systems encounter significant challenges in indoor environments, primarily due to the **absence of GPS signals**, unreliable obstacle detection under **varying lighting conditions**, and unstable target tracking in dynamic scenes. Notably, this system is designed to run entirely on a **DJI Tello EDU** — a **lightweight**, **low-cost** drone with **limited onboard sensing and only one forward-facing camera**. Overcoming these constraints required rethinking robotics pipelines and optimizing real-time computer vision to work under tight hardware limitations.  <br/>
 </div>
 
+| | Presentation Materials  |
+| ------------ | ---------- |
+| Slides | https://docs.google.com/presentation/d/1vAErRwXz4fKOyFAy7Zjih4mDjOXEdM5Q/edit?usp=sharing&ouid=114172766657756283045&rtpof=true&sd=true |
+| Video  | https://youtu.be/KqZ9zE3YTA4 (Slides Go Through) | 
+|        | https://youtu.be/UmgLiAnHYT0 (Drone Action)| 
+|        | https://youtu.be/aFYV2oo3kuk (Drone Action)|
+
 This work delivers:
 - **Reliable person-following** via ArUco marker tracking  
 - **Monocular obstacle avoidance** powered by MiDaS depth estimation  
@@ -16,14 +23,6 @@ This work delivers:
 | DJI Tello EDU                                 | ArUco marker                                      |
 |---------------------------------------------- |---------------------------------------------------|
 |<img src="assets/DJI_Tello_EDU.JPG" width="200"> |<img src="assets/ArUco_6x6_1000-50.svg" width="200"> |
-
-
-| | Presentation Materials  |
-| ------------ | ---------- |
-| Slides | https://docs.google.com/presentation/d/1vAErRwXz4fKOyFAy7Zjih4mDjOXEdM5Q/edit?usp=sharing&ouid=114172766657756283045&rtpof=true&sd=true |
-| Video  | https://youtu.be/KqZ9zE3YTA4 (Slides Go Through) | 
-|        | https://youtu.be/UmgLiAnHYT0 (Drone Action)| 
-|        | https://youtu.be/aFYV2oo3kuk (Drone Action)|
 
 ## 🚀 Features
 
