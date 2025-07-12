@@ -3,8 +3,10 @@
 **Author:** Au, Chin Yuen (Isaac)
 
 ## 📌 Project Overview
-Project Goal: This project focuses on the core real-time navigation system for a future **“Flying Guide Dog”**—an “over‑the‑shoulder” assistive companion drone designed to help visually impaired individuals navigate complex indoor environments safely and autonomously, thus enhancing indoor mobility. While the broader “Flying Guide Dog” initiative envisions features like human-drone interaction, voice feedback, and semantic scene understanding, this project provides the **foundational autonomous navigation engine** that makes those higher-level features possible. <br/> Conventional drone systems encounter significant challenges in indoor environments, primarily due to the **absence of GPS signals**, unreliable obstacle detection under **varying lighting conditions**, and unstable target tracking in dynamic scenes. Notably, this system is designed to run entirely on a **DJI Tello EDU** — a **lightweight**, **low-cost** drone with **limited onboard sensing and only one forward-facing camera**. Overcoming these constraints required rethinking robotics pipelines and optimizing real-time computer vision to work under tight hardware limitations.  <br/>
-
+Project Goal: This project focuses on the core real-time navigation system for a future **“Flying Guide Dog”**—an “over‑the‑shoulder” assistive companion drone designed to help visually impaired individuals navigate complex indoor environments safely and autonomously, thus enhancing indoor mobility. While the broader “Flying Guide Dog” initiative envisions features like human-drone interaction, voice feedback, and semantic scene understanding, this project provides the **foundational autonomous navigation engine** that makes those higher-level features possible. <br/> 
+  
+Conventional drone systems encounter significant challenges in indoor environments, primarily due to the **absence of GPS signals**, unreliable obstacle detection under **varying lighting conditions**, and unstable target tracking in dynamic scenes. Notably, this system is designed to run entirely on a **DJI Tello EDU** — a **lightweight**, **low-cost** drone with **limited onboard sensing and only one forward-facing camera**. Overcoming these constraints required rethinking robotics pipelines and optimizing real-time computer vision to work under tight hardware limitations.  <br/>
+</div>
 
 This work delivers:
 - **Reliable person-following** via ArUco marker tracking  
